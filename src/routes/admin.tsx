@@ -70,7 +70,7 @@ interface Sector { id: string; slug: string; title: string; briefing: string; mi
 interface Agent { id: string; slug: string; display_name: string }
 
 function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
-  const [settings, setSettings] = useState<{ app_title: string; app_subtitle: string }>({ app_title: "", app_subtitle: "" });
+  const [settings, setSettings] = useState<{ app_title: string; app_subtitle: string; route_progress: string }>({ app_title: "", app_subtitle: "", route_progress: "0" });
   const [agents, setAgents] = useState<Agent[]>([]);
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -87,7 +87,7 @@ function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
     if (s.data) {
       const map: Record<string, string> = {};
       for (const r of s.data) map[r.key] = r.value;
-      setSettings({ app_title: map.app_title ?? "", app_subtitle: map.app_subtitle ?? "" });
+      setSettings({ app_title: map.app_title ?? "", app_subtitle: map.app_subtitle ?? "", route_progress: map.route_progress ?? "0" });
     }
     setAgents((a.data ?? []) as Agent[]);
     setPhotos(ph);
@@ -125,6 +125,42 @@ function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
         <label className="block text-xs uppercase text-muted-foreground mt-3">Подзаголовок</label>
         <Input value={settings.app_subtitle} onChange={(e) => setSettings({ ...settings, app_subtitle: e.target.value })} />
         <Button size="sm" onClick={() => saveSetting("app_subtitle", settings.app_subtitle)}>Сохранить</Button>
+      </section>
+
+      {/* Route progress */}
+      <section className="border-2 border-primary/40 bg-card p-4 space-y-3">
+        <h3 className="text-lg uppercase">Прогресс маршрута</h3>
+        <p className="text-xs text-muted-foreground">
+          Точки: 1.Красноярск → 2.Пекин → 3.Гонконг → 4.Дананг → 5.Макао → 6.Пекин
+        </p>
+        <div className="flex items-center gap-3">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={parseInt(settings.route_progress, 10) <= 0}
+            onClick={async () => {
+              const next = String(Math.max(0, parseInt(settings.route_progress, 10) - 1));
+              setSettings({ ...settings, route_progress: next });
+              await saveSetting("route_progress", next);
+            }}
+          >
+            ◀ Назад
+          </Button>
+          <div className="text-2xl text-primary tabular-nums">
+            {settings.route_progress}/6
+          </div>
+          <Button
+            size="sm"
+            disabled={parseInt(settings.route_progress, 10) >= 6}
+            onClick={async () => {
+              const next = String(Math.min(6, parseInt(settings.route_progress, 10) + 1));
+              setSettings({ ...settings, route_progress: next });
+              await saveSetting("route_progress", next);
+            }}
+          >
+            Продвинуть ▶
+          </Button>
+        </div>
       </section>
 
       {/* Agents */}
@@ -209,11 +245,17 @@ function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
         <div className="grid gap-3 sm:grid-cols-3">
           {photos.map((p) => (
             <div key={p.id} className="border border-primary/30 p-2 space-y-1">
-              <img src={api.getPhotoUrl(p.file_path)} alt={p.caption} className="aspect-video w-full object-cover" />
-              <div className="text-xs text-muted-foreground">{p.city} · {p.agent}</div>
+              {p.media_type === "video" ? (
+                <video src={api.getPhotoUrl(p.file_path)} controls className="aspect-video w-full bg-black object-contain" />
+              ) : (
+                <img src={api.getPhotoUrl(p.file_path)} alt={p.caption} className="aspect-video w-full object-cover" />
+              )}
+              <div className="text-xs text-muted-foreground">
+                {p.media_type === "video" ? "🎬 " : ""}{p.city} · {p.agent} · {p.category === "food" ? "еда" : "поле"}
+              </div>
               {p.caption && <div className="text-xs">{p.caption}</div>}
               <Button size="sm" variant="destructive" className="w-full" onClick={async () => {
-                if (!confirm("Удалить фото?")) return;
+                if (!confirm("Удалить запись?")) return;
                 try { await adminDeletePhoto({ data: { password: pw, id: p.id } }); reload(); toast.success("Удалено"); }
                 catch (e) { toast.error((e as Error).message); }
               }}>Удалить</Button>
