@@ -10,16 +10,15 @@ import type {
 } from "./types";
 
 export const cloudApi: ApiClient = {
-  async listPhotos() {
-    const { data, error } = await supabase
-      .from("photos")
-      .select("*")
-      .order("created_at", { ascending: false });
+  async listPhotos(category) {
+    let q = supabase.from("photos").select("*").order("created_at", { ascending: false });
+    if (category) q = q.eq("category", category);
+    const { data, error } = await q;
     if (error) throw error;
     return (data ?? []) as Photo[];
   },
 
-  async uploadPhoto({ file, city, caption, agent, uploaded_by }) {
+  async uploadPhoto({ file, city, caption, agent, uploaded_by, category }) {
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const { error: upErr } = await supabase.storage
@@ -29,7 +28,7 @@ export const cloudApi: ApiClient = {
 
     const { data, error } = await supabase
       .from("photos")
-      .insert({ city, caption, agent, file_path: path, uploaded_by })
+      .insert({ city, caption, agent, file_path: path, uploaded_by, category: category ?? "field" })
       .select()
       .single();
     if (error) throw error;
