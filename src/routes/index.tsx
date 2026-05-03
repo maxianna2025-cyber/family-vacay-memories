@@ -1,26 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PhotoFeed } from "@/components/PhotoFeed";
+import { useUserName } from "@/hooks/useUserName";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () => ({
+    meta: [
+      { title: "База — Спецотряд: Саянская Вершина" },
+      {
+        name: "description",
+        content: "Лента улик: фото из городов отпуска с подписями и комментариями.",
+      },
+    ],
+  }),
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
 function Index() {
-  return <PlaceholderIndex />;
+  const { name } = useUserName();
+  const needName = () => {
+    if (!name) {
+      toast.error("Сначала введите свой позывной (кнопка вверху справа)");
+      return true;
+    }
+    return false;
+  };
+  return <PhotoFeed needName={needName} />;
 }
