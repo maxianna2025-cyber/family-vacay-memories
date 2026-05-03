@@ -84,7 +84,7 @@ export function PhotoFeed({ needName, category = "field" }: Props) {
   return (
     <div className="space-y-8">
       <section className="border border-primary/40 bg-card p-4">
-        <h2 className="mb-3 text-lg uppercase">⊕ Загрузить улику</h2>
+        <h2 className="mb-3 text-lg uppercase">{L.upload}</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <Input
             type="file"
@@ -92,7 +92,7 @@ export function PhotoFeed({ needName, category = "field" }: Props) {
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
           <Input
-            placeholder="Город (Красноярск, Дивногорск...)"
+            placeholder={L.cityPlaceholder}
             value={city}
             maxLength={80}
             onChange={(e) => setCity(e.target.value)}
@@ -104,25 +104,23 @@ export function PhotoFeed({ needName, category = "field" }: Props) {
             onChange={(e) => setAgent(e.target.value)}
           />
           <Input
-            placeholder="Подпись"
+            placeholder={L.captionPlaceholder}
             value={caption}
             maxLength={200}
             onChange={(e) => setCaption(e.target.value)}
           />
         </div>
         <Button className="mt-3" onClick={upload} disabled={busy}>
-          {busy ? "Загрузка..." : "▲ Передать в штаб"}
+          {busy ? "Загрузка..." : L.button}
         </Button>
       </section>
 
       <section>
-        <h2 className="mb-3 text-lg uppercase">▦ Лента операции</h2>
+        <h2 className="mb-3 text-lg uppercase">{L.title}</h2>
         {photos === null ? (
           <p className="text-muted-foreground">Получение данных со спутника...</p>
         ) : photos.length === 0 ? (
-          <p className="text-muted-foreground">
-            Пока пусто. Будь первым агентом, кто пришлёт улику.
-          </p>
+          <p className="text-muted-foreground">{L.empty}</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2">
             {photos.map((p) => (
