@@ -32,25 +32,27 @@
 
 :root {
   --radius: 0.5rem;
-  /* Спецотряд: чёрный фон, оранжевый акцент */
-  --background: oklch(0.13 0 0);              /* #0a0a0a */
-  --foreground: oklch(0.93 0.01 240);         /* #e2e8f0 */
-  --card: oklch(0.17 0 0);                    /* #222222 */
-  --card-foreground: oklch(0.93 0.01 240);
-  --primary: oklch(0.7 0.2 45);               /* #ff6b00 */
-  --primary-foreground: oklch(1 0 0);
-  --primary-hover: oklch(0.62 0.2 40);        /* #e24e00 */
-  --secondary: oklch(0.2 0 0);
-  --secondary-foreground: oklch(0.93 0.01 240);
-  --muted: oklch(0.2 0 0);
-  --muted-foreground: oklch(0.65 0.01 240);
-  --accent: oklch(0.7 0.2 45);
-  --accent-foreground: oklch(1 0 0);
+  /* МЧС России: тёмно-синий фон, оранжевый акцент */
+  --background: oklch(0.18 0.04 250);         /* deep navy */
+  --foreground: oklch(0.96 0.01 240);
+  --card: oklch(0.23 0.05 250);
+  --card-foreground: oklch(0.96 0.01 240);
+  --primary: oklch(0.72 0.19 45);             /* МЧС оранжевый */
+  --primary-foreground: oklch(0.15 0.04 250);
+  --primary-hover: oklch(0.65 0.2 40);
+  --secondary: oklch(0.42 0.14 250);          /* МЧС синий */
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.27 0.04 250);
+  --muted-foreground: oklch(0.75 0.02 240);
+  --accent: oklch(0.72 0.19 45);
+  --accent-foreground: oklch(0.15 0.04 250);
   --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.7 0.2 45 / 40%);
-  --input: oklch(0.18 0 0);
-  --ring: oklch(0.7 0.2 45);
+  --border: oklch(0.42 0.14 250 / 50%);
+  --input: oklch(0.22 0.04 250);
+  --ring: oklch(0.72 0.19 45);
+  --emercom-blue: oklch(0.42 0.14 250);
+  --emercom-orange: oklch(0.72 0.19 45);
 }
 
 @layer base {
