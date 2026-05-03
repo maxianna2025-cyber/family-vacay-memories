@@ -21,20 +21,21 @@ async function j<T>(res: Response): Promise<T> {
 }
 
 export const amveraApi: ApiClient = {
-  async listPhotos() {
-    return j<Photo[]>(await fetch(`${BASE}/get-photos`));
+  async listPhotos(category) {
+    const url = category ? `${BASE}/get-photos?category=${category}` : `${BASE}/get-photos`;
+    return j<Photo[]>(await fetch(url));
   },
 
-  async uploadPhoto({ file, city, caption, agent, uploaded_by }) {
+  async uploadPhoto({ file, city, caption, agent, uploaded_by, category }) {
     const fd = new FormData();
     fd.append("photo", file);
     fd.append("city", city);
     fd.append("caption", caption);
     fd.append("agent", agent);
     fd.append("uploaded_by", uploaded_by);
+    fd.append("category", category ?? "field");
     const res = await fetch(`${BASE}/upload-photo`, { method: "POST", body: fd });
     if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
-    // Сервер отдаёт строку — формируем минимальный Photo на лету.
     return {
       id: crypto.randomUUID(),
       city,
@@ -43,6 +44,7 @@ export const amveraApi: ApiClient = {
       file_path: file.name,
       uploaded_by,
       created_at: new Date().toISOString(),
+      category: category ?? "field",
     };
   },
 
