@@ -26,7 +26,8 @@ export const amveraApi: ApiClient = {
     return j<Photo[]>(await fetch(url));
   },
 
-  async uploadPhoto({ file, city, caption, agent, uploaded_by, category }) {
+  async uploadPhoto({ file, city, caption, agent, uploaded_by, category, media_type }) {
+    const mt = media_type ?? (file.type.startsWith("video/") ? "video" : "image");
     const fd = new FormData();
     fd.append("photo", file);
     fd.append("city", city);
@@ -34,6 +35,7 @@ export const amveraApi: ApiClient = {
     fd.append("agent", agent);
     fd.append("uploaded_by", uploaded_by);
     fd.append("category", category ?? "field");
+    fd.append("media_type", mt);
     const res = await fetch(`${BASE}/upload-photo`, { method: "POST", body: fd });
     if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
     return {
@@ -45,6 +47,7 @@ export const amveraApi: ApiClient = {
       uploaded_by,
       created_at: new Date().toISOString(),
       category: category ?? "field",
+      media_type: mt,
     };
   },
 

@@ -1,4 +1,5 @@
 export type PhotoCategory = "field" | "food";
+export type MediaType = "image" | "video";
 
 export interface Photo {
   id: string;
@@ -9,6 +10,7 @@ export interface Photo {
   uploaded_by: string;
   created_at: string;
   category?: PhotoCategory;
+  media_type?: MediaType;
 }
 
 export interface Comment {
@@ -33,6 +35,7 @@ export interface UploadPhotoInput {
   agent: string;
   uploaded_by: string;
   category?: PhotoCategory;
+  media_type?: MediaType;
 }
 
 export interface AddCommentInput {

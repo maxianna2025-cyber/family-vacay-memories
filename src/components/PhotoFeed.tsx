@@ -57,8 +57,11 @@ export function PhotoFeed({ needName, category = "field" }: Props) {
     if (needName()) return;
     if (!file) return toast.error("Выберите файл");
     if (!city.trim()) return toast.error("Укажите место");
-    if (file.size > 10 * 1024 * 1024) return toast.error("Файл больше 10 МБ");
-    if (!file.type.startsWith("image/")) return toast.error("Только изображения");
+    const isVideo = file.type.startsWith("video/");
+    const isImage = file.type.startsWith("image/");
+    if (!isVideo && !isImage) return toast.error("Только фото или видео");
+    const maxMb = isVideo ? 50 : 10;
+    if (file.size > maxMb * 1024 * 1024) return toast.error(`Файл больше ${maxMb} МБ`);
     setBusy(true);
     try {
       await api.uploadPhoto({
@@ -88,7 +91,7 @@ export function PhotoFeed({ needName, category = "field" }: Props) {
         <div className="grid gap-3 sm:grid-cols-2">
           <Input
             type="file"
-            accept="image/*"
+            accept="image/*,video/mp4,video/quicktime,video/webm"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
           <Input
@@ -167,12 +170,22 @@ function PhotoCard({ photo, needName }: { photo: Photo; needName: () => boolean 
 
   return (
     <article className="flex flex-col border border-primary/40 bg-card">
-      <img
-        src={api.getPhotoUrl(photo.file_path)}
-        alt={photo.caption || photo.city}
-        loading="lazy"
-        className="aspect-video w-full object-cover"
-      />
+      {photo.media_type === "video" ? (
+        <video
+          src={api.getPhotoUrl(photo.file_path)}
+          controls
+          playsInline
+          preload="metadata"
+          className="aspect-video w-full bg-black object-contain"
+        />
+      ) : (
+        <img
+          src={api.getPhotoUrl(photo.file_path)}
+          alt={photo.caption || photo.city}
+          loading="lazy"
+          className="aspect-video w-full object-cover"
+        />
+      )}
       <div className="flex-1 space-y-2 p-3">
         <div className="flex items-center justify-between text-xs uppercase text-muted-foreground">
           <span>◉ {photo.city}</span>

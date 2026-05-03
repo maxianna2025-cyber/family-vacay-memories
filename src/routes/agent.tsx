@@ -112,7 +112,11 @@ function SectorCard({ sector, agentSlug }: { sector: Sector; agentSlug: string }
 
   const uploadProof = async () => {
     if (!file) return toast.error("Выберите файл");
-    if (file.size > 10 * 1024 * 1024) return toast.error("Файл больше 10 МБ");
+    const isVideo = file.type.startsWith("video/");
+    const isImage = file.type.startsWith("image/");
+    if (!isVideo && !isImage) return toast.error("Только фото или видео");
+    const maxMb = isVideo ? 50 : 10;
+    if (file.size > maxMb * 1024 * 1024) return toast.error(`Файл больше ${maxMb} МБ`);
     setUploading(true);
     try {
       await api.uploadPhoto({
@@ -160,8 +164,12 @@ function SectorCard({ sector, agentSlug }: { sector: Sector; agentSlug: string }
             <p className="text-sm">{sector.mission}</p>
           </div>
           <div className="border-t border-primary/30 pt-2">
-            <div className="text-xs uppercase text-primary mb-1">Фото-доказательство</div>
-            <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <div className="text-xs uppercase text-primary mb-1">Фото / Видео-доказательство</div>
+            <Input
+              type="file"
+              accept="image/*,video/mp4,video/quicktime,video/webm"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
             <Button className="mt-2 w-full" size="sm" onClick={uploadProof} disabled={uploading || !file}>
               {uploading ? "Отправка..." : "▲ Передать доказательство"}
             </Button>

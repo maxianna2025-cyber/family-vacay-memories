@@ -18,7 +18,7 @@ export const cloudApi: ApiClient = {
     return (data ?? []) as Photo[];
   },
 
-  async uploadPhoto({ file, city, caption, agent, uploaded_by, category }) {
+  async uploadPhoto({ file, city, caption, agent, uploaded_by, category, media_type }) {
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const { error: upErr } = await supabase.storage
@@ -26,9 +26,10 @@ export const cloudApi: ApiClient = {
       .upload(path, file, { contentType: file.type, upsert: false });
     if (upErr) throw upErr;
 
+    const mt = media_type ?? (file.type.startsWith("video/") ? "video" : "image");
     const { data, error } = await supabase
       .from("photos")
-      .insert({ city, caption, agent, file_path: path, uploaded_by, category: category ?? "field" })
+      .insert({ city, caption, agent, file_path: path, uploaded_by, category: category ?? "field", media_type: mt })
       .select()
       .single();
     if (error) throw error;
