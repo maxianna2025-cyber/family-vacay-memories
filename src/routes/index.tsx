@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PhotoFeed } from "@/components/PhotoFeed";
+import { RouteMap } from "@/components/RouteMap";
 import { useUserName } from "@/hooks/useUserName";
 import { toast } from "sonner";
 
@@ -25,5 +26,10 @@ function Index() {
     }
     return false;
   };
-  return <PhotoFeed needName={needName} />;
+  return (
+    <div className="space-y-6">
+      <RouteMap />
+      <PhotoFeed needName={needName} category="field" />
+    </div>
+  );
 }
