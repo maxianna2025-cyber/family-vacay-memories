@@ -96,6 +96,13 @@ function RootComponent() {
             База / Лента
           </Link>
           <Link
+            to="/food"
+            activeProps={{ className: "bg-primary text-primary-foreground" }}
+            className="border border-primary/60 px-3 py-1 hover:bg-primary/20"
+          >
+            Кухня
+          </Link>
+          <Link
             to="/agent"
             activeProps={{ className: "bg-primary text-primary-foreground" }}
             className="border border-primary/60 px-3 py-1 hover:bg-primary/20"
