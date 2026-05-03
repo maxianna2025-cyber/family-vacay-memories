@@ -116,6 +116,7 @@ export type Database = {
           created_at: string
           file_path: string
           id: string
+          media_type: string
           sector_slug: string | null
           uploaded_by: string
         }
@@ -128,6 +129,7 @@ export type Database = {
           created_at?: string
           file_path: string
           id?: string
+          media_type?: string
           sector_slug?: string | null
           uploaded_by?: string
         }
@@ -140,6 +142,7 @@ export type Database = {
           created_at?: string
           file_path?: string
           id?: string
+          media_type?: string
           sector_slug?: string | null
           uploaded_by?: string
         }
