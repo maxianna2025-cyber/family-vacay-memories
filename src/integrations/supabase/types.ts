@@ -111,6 +111,7 @@ export type Database = {
           agent: string
           agent_slug: string | null
           caption: string
+          category: string
           city: string
           created_at: string
           file_path: string
@@ -122,6 +123,7 @@ export type Database = {
           agent?: string
           agent_slug?: string | null
           caption?: string
+          category?: string
           city: string
           created_at?: string
           file_path: string
@@ -133,6 +135,7 @@ export type Database = {
           agent?: string
           agent_slug?: string | null
           caption?: string
+          category?: string
           city?: string
           created_at?: string
           file_path?: string
