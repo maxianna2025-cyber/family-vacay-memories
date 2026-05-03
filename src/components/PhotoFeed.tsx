@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useUserName } from "@/hooks/useUserName";
-import { api, type Photo, type Comment } from "@/lib/api";
+import { api, type Photo, type Comment, type PhotoCategory } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,12 +8,33 @@ import { toast } from "sonner";
 
 interface Props {
   needName: () => boolean;
+  category?: PhotoCategory;
 }
 
-export function PhotoFeed({ needName }: Props) {
+const LABELS = {
+  field: {
+    title: "▦ Лента операции",
+    upload: "⊕ Загрузить улику",
+    cityPlaceholder: "Город (Красноярск, Дивногорск...)",
+    captionPlaceholder: "Подпись",
+    button: "▲ Передать в штаб",
+    empty: "Пока пусто. Будь первым агентом, кто пришлёт улику.",
+  },
+  food: {
+    title: "▦ Кухня операции",
+    upload: "⊕ Загрузить блюдо",
+    cityPlaceholder: "Где ел (Пекин, ресторан...)",
+    captionPlaceholder: "Что это и как (вкусно? острое?)",
+    button: "▲ Передать рапорт о еде",
+    empty: "Никто ещё не ел. Покажи первое блюдо!",
+  },
+} as const;
+
+export function PhotoFeed({ needName, category = "field" }: Props) {
   const { name } = useUserName();
   const [photos, setPhotos] = useState<Photo[] | null>(null);
   const [busy, setBusy] = useState(false);
+  const L = LABELS[category];
 
   // upload form
   const [file, setFile] = useState<File | null>(null);
@@ -23,18 +44,19 @@ export function PhotoFeed({ needName }: Props) {
 
   const refresh = () =>
     api
-      .listPhotos()
+      .listPhotos(category)
       .then(setPhotos)
       .catch((e) => toast.error("Не удалось загрузить фото: " + e.message));
 
   useEffect(() => {
     refresh();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category]);
 
   const upload = async () => {
     if (needName()) return;
     if (!file) return toast.error("Выберите файл");
-    if (!city.trim()) return toast.error("Укажите город");
+    if (!city.trim()) return toast.error("Укажите место");
     if (file.size > 10 * 1024 * 1024) return toast.error("Файл больше 10 МБ");
     if (!file.type.startsWith("image/")) return toast.error("Только изображения");
     setBusy(true);
@@ -45,11 +67,12 @@ export function PhotoFeed({ needName }: Props) {
         caption: caption.trim().slice(0, 200),
         agent: agent.trim().slice(0, 40),
         uploaded_by: name,
+        category,
       });
       setFile(null);
       setCity("");
       setCaption("");
-      toast.success("Фото загружено");
+      toast.success("Загружено");
       await refresh();
     } catch (e) {
       toast.error("Ошибка загрузки: " + (e as Error).message);
