@@ -1,3 +1,5 @@
+export type PhotoCategory = "field" | "food";
+
 export interface Photo {
   id: string;
   city: string;
@@ -6,6 +8,7 @@ export interface Photo {
   file_path: string;
   uploaded_by: string;
   created_at: string;
+  category?: PhotoCategory;
 }
 
 export interface Comment {
@@ -29,6 +32,7 @@ export interface UploadPhotoInput {
   caption: string;
   agent: string;
   uploaded_by: string;
+  category?: PhotoCategory;
 }
 
 export interface AddCommentInput {
@@ -43,7 +47,7 @@ export interface AddTaskInput {
 }
 
 export interface ApiClient {
-  listPhotos(): Promise<Photo[]>;
+  listPhotos(category?: PhotoCategory): Promise<Photo[]>;
   uploadPhoto(input: UploadPhotoInput): Promise<Photo>;
   getPhotoUrl(file_path: string): string;
   listComments(photoId: string): Promise<Comment[]>;
