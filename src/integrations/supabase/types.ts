@@ -14,7 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      additional_tasks: {
+        Row: {
+          created_at: string
+          id: string
+          task_text: string
+          user_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          task_text: string
+          user_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          task_text?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          comment_text: string
+          created_at: string
+          id: string
+          photo_id: string
+          user_name: string
+        }
+        Insert: {
+          comment_text: string
+          created_at?: string
+          id?: string
+          photo_id: string
+          user_name: string
+        }
+        Update: {
+          comment_text?: string
+          created_at?: string
+          id?: string
+          photo_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "photos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photos: {
+        Row: {
+          agent: string
+          caption: string
+          city: string
+          created_at: string
+          file_path: string
+          id: string
+          uploaded_by: string
+        }
+        Insert: {
+          agent?: string
+          caption?: string
+          city: string
+          created_at?: string
+          file_path: string
+          id?: string
+          uploaded_by?: string
+        }
+        Update: {
+          agent?: string
+          caption?: string
+          city?: string
+          created_at?: string
+          file_path?: string
+          id?: string
+          uploaded_by?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
