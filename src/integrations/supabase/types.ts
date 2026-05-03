@@ -35,6 +35,45 @@ export type Database = {
         }
         Relationships: []
       }
+      agents: {
+        Row: {
+          display_name: string
+          id: string
+          order_index: number
+          slug: string
+        }
+        Insert: {
+          display_name: string
+          id?: string
+          order_index?: number
+          slug: string
+        }
+        Update: {
+          display_name?: string
+          id?: string
+          order_index?: number
+          slug?: string
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           comment_text: string
@@ -70,36 +109,98 @@ export type Database = {
       photos: {
         Row: {
           agent: string
+          agent_slug: string | null
           caption: string
           city: string
           created_at: string
           file_path: string
           id: string
+          sector_slug: string | null
           uploaded_by: string
         }
         Insert: {
           agent?: string
+          agent_slug?: string | null
           caption?: string
           city: string
           created_at?: string
           file_path: string
           id?: string
+          sector_slug?: string | null
           uploaded_by?: string
         }
         Update: {
           agent?: string
+          agent_slug?: string | null
           caption?: string
           city?: string
           created_at?: string
           file_path?: string
           id?: string
+          sector_slug?: string | null
           uploaded_by?: string
+        }
+        Relationships: []
+      }
+      sectors: {
+        Row: {
+          briefing: string
+          id: string
+          mission: string
+          order_index: number
+          password: string
+          slug: string
+          title: string
+        }
+        Insert: {
+          briefing?: string
+          id?: string
+          mission?: string
+          order_index?: number
+          password?: string
+          slug: string
+          title: string
+        }
+        Update: {
+          briefing?: string
+          id?: string
+          mission?: string
+          order_index?: number
+          password?: string
+          slug?: string
+          title?: string
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      sectors_public: {
+        Row: {
+          briefing: string | null
+          id: string | null
+          mission: string | null
+          order_index: number | null
+          slug: string | null
+          title: string | null
+        }
+        Insert: {
+          briefing?: string | null
+          id?: string | null
+          mission?: string | null
+          order_index?: number | null
+          slug?: string | null
+          title?: string | null
+        }
+        Update: {
+          briefing?: string | null
+          id?: string | null
+          mission?: string | null
+          order_index?: number | null
+          slug?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
