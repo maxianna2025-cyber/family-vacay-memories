@@ -71,61 +71,55 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  const settings = useAppSettings();
   return (
     <div className="min-h-screen">
-      <header className="border-b-4 border-primary bg-secondary text-secondary-foreground">
-        <div className="h-1 bg-primary" />
-        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <Link to="/" className="block">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-primary">МЧС России</div>
-            <h1 className="text-lg uppercase tracking-widest sm:text-xl">
-              {settings.app_title}
-            </h1>
-            <div className="text-xs text-secondary-foreground/70">{settings.app_subtitle}</div>
+      <header className="border-b-2 border-primary/40 bg-secondary text-secondary-foreground">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-2">
+          <Link to="/" className="text-[11px] uppercase tracking-[0.3em] text-primary">
+            ⛨ Командный пункт
           </Link>
           <UserNameBadge />
         </div>
-        <nav className="mx-auto flex max-w-5xl flex-wrap gap-2 px-4 pb-3 text-xs uppercase">
+        <nav className="mx-auto flex max-w-6xl flex-wrap gap-2 px-3 pb-2 text-[11px] uppercase">
           <Link
             to="/"
             activeOptions={{ exact: true }}
             activeProps={{ className: "bg-primary text-primary-foreground" }}
-            className="border border-primary/60 px-3 py-1 hover:bg-primary/20"
+            className="border border-primary/60 px-2 py-1 hover:bg-primary/20"
           >
-            База / Лента
+            База
           </Link>
           <Link
             to="/food"
             activeProps={{ className: "bg-primary text-primary-foreground" }}
-            className="border border-primary/60 px-3 py-1 hover:bg-primary/20"
+            className="border border-primary/60 px-2 py-1 hover:bg-primary/20"
           >
             Кухня
           </Link>
           <Link
             to="/agent"
             activeProps={{ className: "bg-primary text-primary-foreground" }}
-            className="border border-primary/60 px-3 py-1 hover:bg-primary/20"
+            className="border border-primary/60 px-2 py-1 hover:bg-primary/20"
           >
-            Кабинет агента
+            Агент
           </Link>
           <Link
             to="/tasks"
             activeProps={{ className: "bg-primary text-primary-foreground" }}
-            className="border border-primary/60 px-3 py-1 hover:bg-primary/20"
+            className="border border-primary/60 px-2 py-1 hover:bg-primary/20"
           >
-            Доп. миссии
+            Задания
           </Link>
           <Link
             to="/admin"
             activeProps={{ className: "bg-primary text-primary-foreground" }}
-            className="ml-auto border border-primary/60 px-3 py-1 hover:bg-primary/20"
+            className="ml-auto border border-primary/60 px-2 py-1 hover:bg-primary/20"
           >
             Штаб
           </Link>
         </nav>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-6">
+      <main className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6">
         <Outlet />
       </main>
       <Toaster />
