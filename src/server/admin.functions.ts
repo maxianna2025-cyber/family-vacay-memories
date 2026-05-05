@@ -120,12 +120,12 @@ export const adminDeleteTask = createServerFn({ method: "POST" })
   });
 
 export const adminAddTask = createServerFn({ method: "POST" })
-  .inputValidator((d: { password: string; task_text: string }) => d)
+  .inputValidator((d: { password: string; task_text: string; sector_slug?: string | null }) => d)
   .handler(async ({ data }) => {
     checkPassword(data.password);
     const { error } = await supabaseAdmin
       .from("additional_tasks")
-      .insert({ task_text: data.task_text, user_name: "ШТАБ" });
+      .insert({ task_text: data.task_text, user_name: "ШТАБ", sector_slug: data.sector_slug ?? null });
     if (error) throw error;
     return { ok: true };
   });
