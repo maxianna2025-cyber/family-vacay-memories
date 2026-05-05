@@ -77,12 +77,14 @@ interface Sector { id: string; slug: string; title: string; briefing: string; mi
 interface Agent { id: string; slug: string; display_name: string }
 
 function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
-  const [settings, setSettings] = useState<{ app_title: string; app_subtitle: string; route_progress: string }>({ app_title: "", app_subtitle: "", route_progress: "0" });
+  const [settings, setSettings] = useState<{ app_title: string; app_subtitle: string; route_progress: string; route_dates: string }>({ app_title: "", app_subtitle: "", route_progress: "0", route_dates: '["05.07","07.07","10.07","13.07","17.07","20.07"]' });
   const [agents, setAgents] = useState<Agent[]>([]);
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
+  const [newTaskSector, setNewTaskSector] = useState<string>("");
+  const parsedDates: string[] = (() => { try { const a = JSON.parse(settings.route_dates); return Array.isArray(a) && a.length === 6 ? a.map(String) : ["","","","","",""]; } catch { return ["","","","","",""]; } })();
 
   const reload = async () => {
     const [s, a, ph, t] = await Promise.all([
@@ -94,7 +96,7 @@ function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
     if (s.data) {
       const map: Record<string, string> = {};
       for (const r of s.data) map[r.key] = r.value;
-      setSettings({ app_title: map.app_title ?? "", app_subtitle: map.app_subtitle ?? "", route_progress: map.route_progress ?? "0" });
+      setSettings({ app_title: map.app_title ?? "", app_subtitle: map.app_subtitle ?? "", route_progress: map.route_progress ?? "0", route_dates: map.route_dates ?? '["05.07","07.07","10.07","13.07","17.07","20.07"]' });
     }
     setAgents((a.data ?? []) as Agent[]);
     setPhotos(ph);
@@ -224,20 +226,56 @@ function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
         ))}
       </section>
 
+      {/* Route dates */}
+      <section className="border-2 border-primary/40 bg-card p-4 space-y-2">
+        <h3 className="text-lg uppercase">Даты маршрута</h3>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {["Красноярск","Пекин","Гонконг","Дананг","Макао","Пекин (возврат)"].map((label, i) => (
+            <label key={i} className="block text-xs">
+              <span className="text-muted-foreground">{i+1}. {label}</span>
+              <Input value={parsedDates[i]} placeholder="ДД.ММ" onChange={(e) => {
+                const next = [...parsedDates]; next[i] = e.target.value;
+                setSettings({ ...settings, route_dates: JSON.stringify(next) });
+              }} />
+            </label>
+          ))}
+        </div>
+        <Button size="sm" onClick={() => saveSetting("route_dates", settings.route_dates)}>Сохранить даты</Button>
+      </section>
+
       {/* Tasks */}
       <section className="border-2 border-primary/40 bg-card p-4 space-y-3">
         <h3 className="text-lg uppercase">Дополнительные задания</h3>
-        <div className="flex gap-2">
+        <div className="space-y-2">
           <Input value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="Новое задание для детей" />
-          <Button onClick={async () => {
-            if (!newTask.trim()) return;
-            try { await adminAddTask({ data: { password: pw, task_text: newTask.trim() } }); setNewTask(""); reload(); }
-            catch (e) { toast.error((e as Error).message); }
-          }}>Добавить</Button>
+          <select
+            value={newTaskSector}
+            onChange={(e) => setNewTaskSector(e.target.value)}
+            className="w-full border border-primary/40 bg-background px-2 py-2 text-sm"
+          >
+            <option value="">Для всех городов</option>
+            <option value="beijing">Пекин</option>
+            <option value="hongkong">Гонконг</option>
+            <option value="danang">Дананг</option>
+            <option value="macau">Макао</option>
+          </select>
+          <Button className="w-full" onClick={async () => {
+            if (!newTask.trim()) return toast.error("Введите текст задания");
+            try {
+              await adminAddTask({ data: { password: pw, task_text: newTask.trim(), sector_slug: newTaskSector || null } });
+              setNewTask(""); setNewTaskSector(""); reload();
+              toast.success("Задание добавлено");
+            } catch (e) { toast.error((e as Error).message); }
+          }}>Добавить задание</Button>
         </div>
         {tasks.map((t) => (
-          <div key={t.id} className="flex items-center justify-between border border-primary/20 p-2 text-sm">
-            <span><span className="text-primary">{t.user_name}:</span> {t.task_text}</span>
+          <div key={t.id} className="flex items-center justify-between gap-2 border border-primary/20 p-2 text-sm">
+            <div className="min-w-0">
+              <div className="text-xs text-primary uppercase">
+                {t.user_name}{t.sector_slug ? ` · ${t.sector_slug}` : ""}
+              </div>
+              <div className="truncate">{t.task_text}</div>
+            </div>
             <Button size="sm" variant="destructive" onClick={async () => {
               try { await adminDeleteTask({ data: { password: pw, id: t.id } }); reload(); }
               catch (e) { toast.error((e as Error).message); }
