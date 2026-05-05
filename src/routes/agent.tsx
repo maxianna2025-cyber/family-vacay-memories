@@ -8,8 +8,13 @@ import { unlockSector } from "@/server/admin.functions";
 import { api } from "@/lib/api";
 import { useUserName } from "@/hooks/useUserName";
 
+type Search = { sector?: string };
+
 export const Route = createFileRoute("/agent")({
   component: AgentPage,
+  validateSearch: (search: Record<string, unknown>): Search => ({
+    sector: typeof search.sector === "string" ? search.sector : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Кабинет агента — Спецотряд" }],
   }),
@@ -21,6 +26,7 @@ interface Sector { id: string; slug: string; title: string; briefing: string; mi
 const AGENT_KEY = "spec:selectedAgent";
 
 function AgentPage() {
+  const { sector: focusSector } = Route.useSearch();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [agent, setAgent] = useState<string | null>(
@@ -29,7 +35,7 @@ function AgentPage() {
 
   useEffect(() => {
     supabase.from("agents").select("*").order("order_index").then(({ data }) => setAgents((data ?? []) as Agent[]));
-    supabase.from("sectors_public").select("*").order("order_index").then(({ data }) => setSectors((data ?? []) as Sector[]));
+    supabase.from("sectors").select("id,slug,title,briefing,mission,order_index").order("order_index").then(({ data }) => setSectors((data ?? []) as Sector[]));
   }, []);
 
   const choose = (slug: string) => {
@@ -75,14 +81,14 @@ function AgentPage() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {sectors.map((s) => (
-          <SectorCard key={s.id} sector={s} agentSlug={agent} />
+          <SectorCard key={s.id} sector={s} agentSlug={agent} autoFocus={focusSector === s.slug} />
         ))}
       </div>
     </div>
   );
 }
 
-function SectorCard({ sector, agentSlug }: { sector: Sector; agentSlug: string }) {
+function SectorCard({ sector, agentSlug, autoFocus }: { sector: Sector; agentSlug: string; autoFocus?: boolean }) {
   const lockKey = `unlocked:${agentSlug}:${sector.slug}`;
   const [unlocked, setUnlocked] = useState(false);
   const [pw, setPw] = useState("");
@@ -96,7 +102,7 @@ function SectorCard({ sector, agentSlug }: { sector: Sector; agentSlug: string }
   }, [lockKey]);
 
   const tryUnlock = async () => {
-    if (!pw.trim()) return;
+    if (!pw.trim()) return toast.error("Введите пароль сектора");
     setBusy(true);
     try {
       await unlockSector({ data: { slug: sector.slug, password: pw.trim() } });
@@ -136,7 +142,9 @@ function SectorCard({ sector, agentSlug }: { sector: Sector; agentSlug: string }
   };
 
   return (
-    <article className="border-2 border-primary/40 bg-card p-4">
+    <article
+      className={`border-2 ${autoFocus ? "border-primary ring-2 ring-primary/40" : "border-primary/40"} bg-card p-4`}
+    >
       <h3 className="text-lg uppercase text-primary">{sector.title}</h3>
       {!unlocked ? (
         <div className="mt-3 space-y-2">
@@ -149,14 +157,7 @@ function SectorCard({ sector, agentSlug }: { sector: Sector; agentSlug: string }
             onChange={(e) => setPw(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
           />
-          <Button
-            className="w-full"
-            onClick={() => {
-              if (!pw.trim()) return toast.error("Введите пароль сектора");
-              tryUnlock();
-            }}
-            disabled={busy}
-          >
+          <Button className="w-full" onClick={tryUnlock} disabled={busy}>
             {busy ? "Проверка..." : "Открыть"}
           </Button>
         </div>
