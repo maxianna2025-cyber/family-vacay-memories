@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PhotoFeed } from "@/components/PhotoFeed";
+import { HeroHeader } from "@/components/HeroHeader";
 import { RouteMap } from "@/components/RouteMap";
+import { CityPreviews } from "@/components/CityPreviews";
+import { EventFeedCompact } from "@/components/EventFeedCompact";
+import { MissionTasksCard } from "@/components/MissionTasksCard";
+import { MissionStats } from "@/components/MissionStats";
+import { PhotoFeed } from "@/components/PhotoFeed";
 import { useUserName } from "@/hooks/useUserName";
 import { toast } from "sonner";
 
@@ -11,7 +16,7 @@ export const Route = createFileRoute("/")({
       { title: "База — Спецотряд: Саянская Вершина" },
       {
         name: "description",
-        content: "Лента улик: фото из городов отпуска с подписями и комментариями.",
+        content: "Командный пункт операции: карта, города, лента и задания.",
       },
     ],
   }),
@@ -26,9 +31,27 @@ function Index() {
     }
     return false;
   };
+
   return (
-    <div className="space-y-6">
-      <RouteMap />
+    <div className="space-y-4">
+      <HeroHeader />
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <RouteMap />
+        </div>
+        <div>
+          <CityPreviews />
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <EventFeedCompact />
+        <MissionTasksCard />
+      </div>
+
+      <MissionStats />
+
       <PhotoFeed needName={needName} category="field" />
     </div>
   );
