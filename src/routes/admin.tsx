@@ -56,7 +56,14 @@ function AdminPage() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && login()}
         />
-        <Button className="w-full" onClick={login} disabled={busy || !input}>
+        <Button
+          className="w-full"
+          onClick={() => {
+            if (!input.trim()) return toast.error("Введите мастер-пароль");
+            login();
+          }}
+          disabled={busy}
+        >
           {busy ? "Проверка..." : "Войти"}
         </Button>
       </div>

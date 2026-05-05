@@ -149,7 +149,14 @@ function SectorCard({ sector, agentSlug }: { sector: Sector; agentSlug: string }
             onChange={(e) => setPw(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
           />
-          <Button className="w-full" onClick={tryUnlock} disabled={busy}>
+          <Button
+            className="w-full"
+            onClick={() => {
+              if (!pw.trim()) return toast.error("Введите пароль сектора");
+              tryUnlock();
+            }}
+            disabled={busy}
+          >
             {busy ? "Проверка..." : "Открыть"}
           </Button>
         </div>
@@ -170,7 +177,7 @@ function SectorCard({ sector, agentSlug }: { sector: Sector; agentSlug: string }
               accept="image/*,video/mp4,video/quicktime,video/webm"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
-            <Button className="mt-2 w-full" size="sm" onClick={uploadProof} disabled={uploading || !file}>
+            <Button className="mt-2 w-full" size="sm" onClick={uploadProof} disabled={uploading}>
               {uploading ? "Отправка..." : "▲ Передать доказательство"}
             </Button>
           </div>

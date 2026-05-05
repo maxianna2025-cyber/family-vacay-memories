@@ -113,7 +113,10 @@ export function PhotoFeed({ needName, category = "field" }: Props) {
             onChange={(e) => setCaption(e.target.value)}
           />
         </div>
-        <Button className="mt-3" onClick={upload} disabled={busy}>
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          Нужны: файл (фото/видео), место и позывной агента вверху.
+        </p>
+        <Button className="mt-2" onClick={upload} disabled={busy}>
           {busy ? "Загрузка..." : L.button}
         </Button>
       </section>
@@ -214,8 +217,15 @@ function PhotoCard({ photo, needName }: { photo: Photo; needName: () => boolean 
             placeholder="Передать сообщение..."
             className="min-h-[60px]"
           />
-          <Button size="sm" onClick={send} disabled={sending || !text.trim()}>
-            ▶ Отправить
+          <Button
+            size="sm"
+            onClick={() => {
+              if (!text.trim()) return toast.error("Сначала напишите сообщение");
+              send();
+            }}
+            disabled={sending}
+          >
+            {sending ? "Отправка..." : "▶ Отправить"}
           </Button>
         </div>
       </div>
