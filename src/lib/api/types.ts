@@ -26,6 +26,7 @@ export interface Task {
   user_name: string;
   task_text: string;
   created_at: string;
+  sector_slug?: string | null;
 }
 
 export interface UploadPhotoInput {
@@ -47,6 +48,7 @@ export interface AddCommentInput {
 export interface AddTaskInput {
   user_name: string;
   task_text: string;
+  sector_slug?: string | null;
 }
 
 export interface ApiClient {
