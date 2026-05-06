@@ -14,6 +14,7 @@ import {
   adminDeletePhoto,
   adminDeleteTask,
   adminAddTask,
+  adminUpdateTask,
 } from "@/server/admin.functions";
 import { api, type Photo, type Task } from "@/lib/api";
 
