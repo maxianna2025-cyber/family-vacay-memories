@@ -129,3 +129,15 @@ export const adminAddTask = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+export const adminUpdateTask = createServerFn({ method: "POST" })
+  .inputValidator((d: { password: string; id: string; task_text: string; sector_slug?: string | null }) => d)
+  .handler(async ({ data }) => {
+    checkPassword(data.password);
+    const { error } = await supabaseAdmin
+      .from("additional_tasks")
+      .update({ task_text: data.task_text, sector_slug: data.sector_slug ?? null })
+      .eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
