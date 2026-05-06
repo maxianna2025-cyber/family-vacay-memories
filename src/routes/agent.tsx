@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { unlockSector } from "@/server/admin.functions";
-import { api } from "@/lib/api";
+import { api, type Task } from "@/lib/api";
 import { useUserName } from "@/hooks/useUserName";
 
 type Search = { sector?: string };
