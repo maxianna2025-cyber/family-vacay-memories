@@ -71,12 +71,38 @@ function TasksPage() {
         ) : tasks.length === 0 ? (
           <p className="text-muted-foreground">Пока заданий нет.</p>
         ) : (
-          <div className="space-y-3">
-            {tasks.map((t) => (
-              <div
-                key={t.id}
-                className="border border-primary/40 bg-card p-3"
-              >
+          <GroupedTasks tasks={tasks} />
+        )}
+      </section>
+    </div>
+  );
+}
+
+const CITY_LABELS: Record<string, string> = {
+  beijing: "Пекин",
+  hongkong: "Гонконг",
+  danang: "Дананг",
+  macau: "Макао",
+};
+const CITY_ORDER = ["beijing", "hongkong", "danang", "macau", ""];
+
+function GroupedTasks({ tasks }: { tasks: Task[] }) {
+  const groups = CITY_ORDER.map((slug) => ({
+    slug,
+    label: slug ? CITY_LABELS[slug] : "Общие",
+    items: tasks.filter((t) => (t.sector_slug ?? "") === slug),
+  })).filter((g) => g.items.length > 0);
+
+  return (
+    <div className="space-y-6">
+      {groups.map((g) => (
+        <div key={g.slug || "all"} className="space-y-2">
+          <h3 className="text-sm uppercase tracking-widest text-primary border-b border-primary/30 pb-1">
+            ⌂ {g.label} <span className="text-muted-foreground">({g.items.length})</span>
+          </h3>
+          <div className="space-y-2">
+            {g.items.map((t) => (
+              <div key={t.id} className="border border-primary/40 bg-card p-3">
                 <div className="flex items-center justify-between text-xs uppercase text-muted-foreground">
                   <span className="text-primary">{t.user_name}</span>
                   <span>{new Date(t.created_at).toLocaleString("ru-RU")}</span>
@@ -85,8 +111,8 @@ function TasksPage() {
               </div>
             ))}
           </div>
-        )}
-      </section>
+        </div>
+      ))}
     </div>
   );
 }
