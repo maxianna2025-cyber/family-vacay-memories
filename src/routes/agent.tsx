@@ -167,10 +167,13 @@ function SectorCard({ sector, agentSlug, autoFocus }: { sector: Sector; agentSlu
             <div className="text-xs uppercase text-muted-foreground">Брифинг</div>
             <p className="text-sm">{sector.briefing}</p>
           </div>
-          <div>
-            <div className="text-xs uppercase text-muted-foreground">Задание</div>
-            <p className="text-sm">{sector.mission}</p>
-          </div>
+          {sector.mission && (
+            <div>
+              <div className="text-xs uppercase text-muted-foreground">Главная цель</div>
+              <p className="text-sm">{sector.mission}</p>
+            </div>
+          )}
+          <SectorTasks slug={sector.slug} />
           <div className="border-t border-primary/30 pt-2">
             <div className="text-xs uppercase text-primary mb-1">Фото / Видео-доказательство</div>
             <Input
@@ -185,5 +188,34 @@ function SectorCard({ sector, agentSlug, autoFocus }: { sector: Sector; agentSlu
         </div>
       )}
     </article>
+  );
+}
+
+function SectorTasks({ slug }: { slug: string }) {
+  const [tasks, setTasks] = useState<Task[] | null>(null);
+  useEffect(() => {
+    api
+      .listTasks()
+      .then((all) => setTasks(all.filter((t) => t.sector_slug === slug || !t.sector_slug)))
+      .catch(() => setTasks([]));
+  }, [slug]);
+
+  if (tasks === null) return <div className="text-xs text-muted-foreground">Загрузка заданий...</div>;
+  if (tasks.length === 0) return null;
+
+  return (
+    <div>
+      <div className="text-xs uppercase text-muted-foreground mb-1">
+        Задания ({tasks.length})
+      </div>
+      <ol className="space-y-1.5 text-sm">
+        {tasks.map((t, i) => (
+          <li key={t.id} className="flex gap-2 border-l-2 border-primary/40 pl-2">
+            <span className="text-primary font-mono text-xs pt-0.5">{i + 1}.</span>
+            <span className="flex-1">{t.task_text}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
