@@ -273,3 +273,150 @@ function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
     </div>
   );
 }
+
+const CITY_OPTIONS: { slug: string; label: string }[] = [
+  { slug: "", label: "Все города" },
+  { slug: "beijing", label: "Пекин" },
+  { slug: "hongkong", label: "Гонконг" },
+  { slug: "danang", label: "Дананг" },
+  { slug: "macau", label: "Макао" },
+];
+
+function TasksByCity({ pw, tasks, reload }: { pw: string; tasks: Task[]; reload: () => Promise<void> }) {
+  const groups = CITY_OPTIONS.map((c) => ({
+    ...c,
+    items: tasks.filter((t) => (t.sector_slug ?? "") === c.slug),
+  }));
+
+  return (
+    <section className="space-y-4">
+      <h3 className="text-lg uppercase">Задания по городам</h3>
+      {groups.map((g) => (
+        <CityTaskGroup key={g.slug || "all"} pw={pw} group={g} reload={reload} />
+      ))}
+    </section>
+  );
+}
+
+function CityTaskGroup({
+  pw,
+  group,
+  reload,
+}: {
+  pw: string;
+  group: { slug: string; label: string; items: Task[] };
+  reload: () => Promise<void>;
+}) {
+  const [newText, setNewText] = useState("");
+  const [adding, setAdding] = useState(false);
+
+  const add = async () => {
+    if (!newText.trim()) return toast.error("Введите текст задания");
+    setAdding(true);
+    try {
+      await adminAddTask({
+        data: { password: pw, task_text: newText.trim(), sector_slug: group.slug || null },
+      });
+      setNewText("");
+      await reload();
+      toast.success("Задание добавлено");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  return (
+    <div className="border-2 border-primary/40 bg-card p-3 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="text-sm uppercase text-primary">⌂ {group.label}</div>
+        <div className="text-[10px] uppercase text-muted-foreground">{group.items.length} зад.</div>
+      </div>
+
+      {group.items.length === 0 && (
+        <div className="text-xs text-muted-foreground">Заданий ещё нет.</div>
+      )}
+
+      <div className="space-y-2">
+        {group.items.map((t) => (
+          <TaskRow key={t.id} pw={pw} task={t} reload={reload} />
+        ))}
+      </div>
+
+      <div className="border-t border-primary/20 pt-2 space-y-2">
+        <Textarea
+          value={newText}
+          onChange={(e) => setNewText(e.target.value)}
+          placeholder={`Новое задание для: ${group.label}`}
+          className="min-h-[60px]"
+        />
+        <Button size="sm" onClick={add} disabled={adding}>
+          {adding ? "Добавление..." : "+ Добавить задание"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function TaskRow({ pw, task, reload }: { pw: string; task: Task; reload: () => Promise<void> }) {
+  const [text, setText] = useState(task.task_text);
+  const [sector, setSector] = useState<string>(task.sector_slug ?? "");
+  const [busy, setBusy] = useState(false);
+  const dirty = text !== task.task_text || (sector || null) !== (task.sector_slug ?? null);
+
+  const save = async () => {
+    if (!text.trim()) return toast.error("Текст не может быть пустым");
+    setBusy(true);
+    try {
+      await adminUpdateTask({
+        data: { password: pw, id: task.id, task_text: text.trim(), sector_slug: sector || null },
+      });
+      await reload();
+      toast.success("Сохранено");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const del = async () => {
+    if (!confirm("Удалить задание?")) return;
+    try {
+      await adminDeleteTask({ data: { password: pw, id: task.id } });
+      await reload();
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
+  return (
+    <div className="border border-primary/20 p-2 space-y-2">
+      <div className="flex items-center justify-between text-[10px] uppercase text-muted-foreground">
+        <span>{task.user_name}</span>
+        <span>{new Date(task.created_at).toLocaleDateString("ru-RU")}</span>
+      </div>
+      <Textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        className="min-h-[60px] text-sm"
+      />
+      <div className="flex items-center gap-2">
+        <select
+          value={sector}
+          onChange={(e) => setSector(e.target.value)}
+          className="flex-1 border border-primary/40 bg-background px-2 py-1 text-xs"
+        >
+          {CITY_OPTIONS.map((c) => (
+            <option key={c.slug || "all"} value={c.slug}>{c.label}</option>
+          ))}
+        </select>
+        <Button size="sm" onClick={save} disabled={busy || !dirty}>
+          {busy ? "..." : dirty ? "Сохранить" : "OK"}
+        </Button>
+        <Button size="sm" variant="destructive" onClick={del}>×</Button>
+      </div>
+    </div>
+  );
+}
