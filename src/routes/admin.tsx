@@ -83,8 +83,7 @@ function AdminPanel({ pw, onLogout }: { pw: string; onLogout: () => void }) {
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTask, setNewTask] = useState("");
-  const [newTaskSector, setNewTaskSector] = useState<string>("");
+  // task creation handled inside TasksByCity
   const parsedDates: string[] = (() => { try { const a = JSON.parse(settings.route_dates); return Array.isArray(a) && a.length === 6 ? a.map(String) : ["","","","","",""]; } catch { return ["","","","","",""]; } })();
 
   const reload = async () => {
