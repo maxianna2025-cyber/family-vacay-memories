@@ -36,14 +36,9 @@ function Index() {
     <div className="space-y-4">
       <HeroHeader />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <RouteMap />
-        </div>
-        <div>
-          <CityPreviews />
-        </div>
-      </div>
+      <RouteMap />
+
+      <CityPreviews />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <EventFeedCompact />
