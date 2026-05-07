@@ -31,12 +31,21 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Спецотряд: Саянская Вершина" },
+      { title: "Спецотряд: Восточный Меридиан" },
       {
         name: "description",
         content:
           "Семейный журнал отпуска: фото, комментарии и спецзадания для отряда.",
       },
+      { property: "og:title", content: "Спецотряд: Восточный Меридиан" },
+      { name: "twitter:title", content: "Спецотряд: Восточный Меридиан" },
+      { name: "description", content: "Family Photo Journey is a web application for sharing vacation photos and tasks." },
+      { property: "og:description", content: "Family Photo Journey is a web application for sharing vacation photos and tasks." },
+      { name: "twitter:description", content: "Family Photo Journey is a web application for sharing vacation photos and tasks." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/VXzmpfVa5CTZJ8TA9wvfuATawO53/social-images/social-1778168501868-1000056756.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/VXzmpfVa5CTZJ8TA9wvfuATawO53/social-images/social-1778168501868-1000056756.webp" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
