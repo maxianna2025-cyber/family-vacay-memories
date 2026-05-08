@@ -5,23 +5,34 @@ type Stop = {
   key: string;
   name: string;
   date_idx: number;
-  date_idx2?: number;
 };
 
 const STOPS: Stop[] = [
-  { key: "krk", name: "КРАСНОЯРСК", date_idx: 0 },
-  { key: "pek", name: "ПЕКИН", date_idx: 1 },
-  { key: "hk", name: "ГОНКОНГ / МАКАО", date_idx: 2, date_idx2: 4 },
+  { key: "krk1", name: "КРАСНОЯРСК", date_idx: 0 },
+  { key: "pek1", name: "ПЕКИН", date_idx: 1 },
+  { key: "hk", name: "ГОНКОНГ", date_idx: 2 },
   { key: "dn", name: "ДАНАНГ", date_idx: 3 },
+  { key: "mac", name: "МАКАО", date_idx: 4 },
+  { key: "pek2", name: "ПЕКИН", date_idx: 5 },
+  { key: "krk2", name: "КРАСНОЯРСК", date_idx: 6 },
 ];
+
+const DEFAULT_DATES = ["05.07", "07.07", "10.07", "13.07", "17.07", "20.07", "22.07"];
 
 export function RouteMap() {
   const [progress, setProgress] = useState(0);
-  const [dates, setDates] = useState<string[]>([
-    "05.07", "07.07", "10.07", "13.07", "17.07", "22.07",
-  ]);
+  const [dates, setDates] = useState<string[]>(DEFAULT_DATES);
 
   useEffect(() => {
+    const applyDates = (raw: string) => {
+      try {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length >= STOPS.length) {
+          setDates(arr.slice(0, STOPS.length).map(String));
+        }
+      } catch {}
+    };
+
     supabase
       .from("app_settings")
       .select("key,value")
@@ -33,12 +44,7 @@ export function RouteMap() {
             const n = parseInt(r.value ?? "0", 10);
             if (!Number.isNaN(n)) setProgress(Math.max(0, Math.min(STOPS.length, n)));
           }
-          if (r.key === "route_dates") {
-            try {
-              const arr = JSON.parse(r.value);
-              if (Array.isArray(arr) && arr.length === 6) setDates(arr.map(String));
-            } catch {}
-          }
+          if (r.key === "route_dates") applyDates(r.value);
         }
       });
 
@@ -54,12 +60,7 @@ export function RouteMap() {
             const n = parseInt(v ?? "0", 10);
             if (!Number.isNaN(n)) setProgress(Math.max(0, Math.min(STOPS.length, n)));
           }
-          if (k === "route_dates") {
-            try {
-              const arr = JSON.parse(v);
-              if (Array.isArray(arr) && arr.length === 6) setDates(arr.map(String));
-            } catch {}
-          }
+          if (k === "route_dates") applyDates(v);
         },
       )
       .subscribe();
@@ -84,20 +85,16 @@ export function RouteMap() {
         </span>
       </div>
 
-      <div className="px-3 py-3 sm:px-5 sm:py-4">
-        <div className="flex items-start">
+      <div className="px-2 py-3 sm:px-4 sm:py-4 overflow-x-auto">
+        <div className="flex items-start min-w-[520px]">
           {STOPS.map((s, i) => {
             const isDone = i < progress;
             const isActive = i === progress && progress < STOPS.length;
             const isLast = i === STOPS.length - 1;
             const segDone = i < progress;
-            const dateText = s.date_idx2 != null
-              ? `${dates[s.date_idx]} · ${dates[s.date_idx2]}`
-              : dates[s.date_idx];
 
             return (
               <div key={s.key} className="flex items-start flex-1 min-w-0">
-                {/* dot + label column */}
                 <div className="flex flex-col items-center shrink-0 w-0">
                   <div className="relative h-4 flex items-center justify-center">
                     {isActive && (
@@ -113,22 +110,21 @@ export function RouteMap() {
                       }
                     />
                   </div>
-                  <div className="mt-2 text-center w-24 -mx-12">
+                  <div className="mt-2 text-center w-20 -mx-10">
                     <div
                       className={
-                        "text-[10px] sm:text-xs uppercase tracking-widest leading-tight " +
+                        "text-[10px] uppercase tracking-widest leading-tight " +
                         (isActive || isDone ? "text-primary" : "text-muted-foreground")
                       }
                     >
                       {s.name}
                     </div>
                     <div className="mt-0.5 text-[10px] text-muted-foreground">
-                      {dateText}
+                      {dates[s.date_idx]}
                     </div>
                   </div>
                 </div>
 
-                {/* connector */}
                 {!isLast && (
                   <div className="flex-1 h-4 flex items-center px-1">
                     <div
@@ -156,7 +152,7 @@ export function RouteMap() {
               ? "Операция завершена"
               : `Сейчас: ${STOPS[activeIdx].name}`}
         </span>
-        <span>Финиш {dates[5]}</span>
+        <span>Финиш {dates[STOPS.length - 1]}</span>
       </div>
     </section>
   );
